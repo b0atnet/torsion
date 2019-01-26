@@ -8,10 +8,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-/**
- * Created by Jordin on 8/4/2017.
- * Jordin is still best hacker.
- */
 public class FileParserFactory {
     private static final Map<String, Class<? extends FileStorageParser>> PARSER_MAP = ImmutableMap.<String, Class<? extends FileStorageParser>>builder()
             .put("json", JSONFileParser.class)
@@ -29,6 +25,6 @@ public class FileParserFactory {
 
         Class<? extends FileStorageParser> parserClass = PARSER_MAP.getOrDefault(extension, NullFileParser.class);
 
-        return parserClass.getDeclaredConstructor(File.class).<T>newInstance(file);
+        return parserClass.getDeclaredConstructor(File.class).newInstance(file);
     }
 }

@@ -6,11 +6,10 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.*;
 
-/**
- * Created by Jordin on 8/4/2017.
- * Jordin is still best hacker.
- */
 public class JSONFileParser<T> extends FileStorageParser<T> {
+    private static boolean serializeNulls;
+    private static boolean lenient;
+
     public JSONFileParser(File file) {
         super(file);
     }
@@ -51,6 +50,24 @@ public class JSONFileParser<T> extends FileStorageParser<T> {
     }
 
     private static Gson constructGsonBuilder() {
-        return new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        if (JSONFileParser.serializeNulls) {
+            builder.serializeNulls();
+        }
+
+        if (JSONFileParser.lenient) {
+            builder.setLenient();
+        }
+
+        return builder.create();
+    }
+
+    public static void setSerializeNulls(boolean serializeNulls) {
+        JSONFileParser.serializeNulls = serializeNulls;
+    }
+
+    public static void setLenient(boolean lenient) {
+        JSONFileParser.lenient = lenient;
     }
 }

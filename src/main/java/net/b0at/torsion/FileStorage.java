@@ -7,10 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-/**
- * Created by Jordin on 8/4/2017.
- * Jordin is still best hacker.
- */
 public class FileStorage<T> implements Storage<T> {
     private static File baseDirectory = new File(".");
     private final File file;

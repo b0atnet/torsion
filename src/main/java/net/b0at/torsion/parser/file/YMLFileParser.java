@@ -7,10 +7,6 @@ import com.esotericsoftware.yamlbeans.YamlWriter;
 
 import java.io.*;
 
-/**
- * Created by Jordin on 8/4/2017.
- * Jordin is still best hacker.
- */
 public class YMLFileParser<T> extends FileStorageParser<T> {
     public YMLFileParser(File file) {
         super(file);
