@@ -6,6 +6,7 @@ import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 
 import java.io.*;
+import java.util.Optional;
 
 public class YMLFileParser<T> extends FileStorageParser<T> {
     public YMLFileParser(File file) {
@@ -13,30 +14,21 @@ public class YMLFileParser<T> extends FileStorageParser<T> {
     }
 
     @Override
-    public T load(Class<T> clazz) {
-        T loaded = null;
-
+    public Optional<T> load(Class<T> clazz) {
         try {
-            YamlReader reader = new YamlReader(new FileReader(getFile()));
-            loaded = reader.read(clazz);
+            YamlReader reader = new YamlReader(new FileReader(this.file));
+            return Optional.ofNullable(reader.read(clazz));
         } catch (YamlException | FileNotFoundException exception) {
             exception.printStackTrace();
         }
 
-        if (loaded == null) {
-            try {
-                loaded = clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return loaded;
+        return Optional.empty();
     }
 
     @Override
     public void save(T object) {
         try {
-            YamlWriter writer = new YamlWriter(new FileWriter(getFile()));
+            YamlWriter writer = new YamlWriter(new FileWriter(this.file));
             writer.getConfig().writeConfig.setIndentSize(2);
             writer.getConfig().writeConfig.setAutoAnchor(false);
             writer.getConfig().writeConfig.setWriteDefaultValues(true);

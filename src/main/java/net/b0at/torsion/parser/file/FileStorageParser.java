@@ -5,7 +5,7 @@ import net.b0at.torsion.parser.StorageParser;
 import java.io.File;
 
 public abstract class FileStorageParser<T> implements StorageParser<T> {
-    private File file;
+    protected File file;
 
     public FileStorageParser(File file) {
         this.file = file;

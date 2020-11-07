@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import java.io.*;
+import java.util.Optional;
 
 public class JSONFileParser<T> extends FileStorageParser<T> {
     private static boolean serializeNulls;
@@ -15,32 +16,24 @@ public class JSONFileParser<T> extends FileStorageParser<T> {
     }
 
     @Override
-    public T load(Class<T> clazz) {
-        T loaded = null;
+    public Optional<T> load(Class<T> clazz) {
         try {
             Gson gson = constructGsonBuilder();
-            JsonReader reader = new JsonReader(new FileReader(getFile()));
+            JsonReader reader = new JsonReader(new FileReader(this.file));
             reader.setLenient(true);
 
-            loaded = gson.fromJson(reader, clazz);
+            return Optional.ofNullable(gson.fromJson(reader, clazz));
         } catch (FileNotFoundException exception) {
             exception.printStackTrace();
         }
 
-        if (loaded == null) {
-            try {
-                loaded = clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return loaded;
+        return Optional.empty();
     }
 
     @Override
     public void save(T object) {
         try {
-            Writer writer = new FileWriter(getFile());
+            Writer writer = new FileWriter(this.file);
             Gson gson = constructGsonBuilder();
             gson.toJson(object, writer);
             writer.close();

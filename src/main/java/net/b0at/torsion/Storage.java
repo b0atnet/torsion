@@ -1,7 +1,9 @@
 package net.b0at.torsion;
 
+import java.util.Optional;
+
 public interface Storage<T> {
-    T load();
+    Optional<T> load();
 
     void save(T object);
 }

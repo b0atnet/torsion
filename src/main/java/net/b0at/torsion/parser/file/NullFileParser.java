@@ -1,6 +1,7 @@
 package net.b0at.torsion.parser.file;
 
 import java.io.File;
+import java.util.Optional;
 
 public class NullFileParser<T> extends FileStorageParser<T> {
     public NullFileParser(File file) {
@@ -8,8 +9,8 @@ public class NullFileParser<T> extends FileStorageParser<T> {
     }
 
     @Override
-    public T load(Class<T> clazz) {
-        return null;
+    public Optional<T> load(Class<T> clazz) {
+        return Optional.empty();
     }
 
     @Override

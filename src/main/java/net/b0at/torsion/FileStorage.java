@@ -6,6 +6,7 @@ import net.b0at.torsion.parser.file.FileParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 public class FileStorage<T> implements Storage<T> {
     private static File baseDirectory = new File(".");
@@ -53,7 +54,7 @@ public class FileStorage<T> implements Storage<T> {
     }
 
     @Override
-    public T load() {
+    public Optional<T> load() {
         return this.fileParser.load(this.clazz);
     }
 }

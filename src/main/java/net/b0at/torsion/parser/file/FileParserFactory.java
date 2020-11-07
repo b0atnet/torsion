@@ -11,6 +11,7 @@ import java.util.Map;
 public class FileParserFactory {
     private static final Map<String, Class<? extends FileStorageParser>> PARSER_MAP = ImmutableMap.<String, Class<? extends FileStorageParser>>builder()
             .put("json", JSONFileParser.class)
+            .put("xml", XMLFileParser.class)
             .put("yml", YMLFileParser.class)
             .build();
 
@@ -19,10 +20,6 @@ public class FileParserFactory {
     }
 
     public static <T> StorageParser from(File file, String extension) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        if (extension.equals("xml")) {
-            throw new RuntimeException("Please use a better file type/extension.");
-        }
-
         Class<? extends FileStorageParser> parserClass = PARSER_MAP.getOrDefault(extension, NullFileParser.class);
 
         return parserClass.getDeclaredConstructor(File.class).newInstance(file);
