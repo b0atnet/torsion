@@ -2,39 +2,39 @@ package net.b0at.torsion.parser.file;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import net.b0at.torsion.TorsionException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public class XMLFileParser<T> extends FileStorageParser<T> {
-    public XMLFileParser(File file) {
+    public XMLFileParser(Path file) {
         super(file);
     }
 
     @Override
     public Optional<T> load(Class<T> clazz) {
-        XmlMapper xmlMapper = new XmlMapper();
-
-        try {
-            return Optional.of(xmlMapper.readValue(this.file, clazz));
+        try (Reader reader = Files.newBufferedReader(this.file)) {
+            XmlMapper xmlMapper = new XmlMapper();
+            return Optional.of(xmlMapper.readValue(reader, clazz));
         } catch (IOException exception) {
-            exception.printStackTrace();
+            throw new TorsionException("Failed to read XML file!", exception);
         }
-
-        return Optional.empty();
     }
 
     @Override
     public void save(T object) {
-        XmlMapper xmlMapper = new XmlMapper();
-
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        try {
-            xmlMapper.writeValue(this.file, object);
+        try (Writer writer = Files.newBufferedWriter(this.file)) {
+            XmlMapper xmlMapper = new XmlMapper();
+            xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            xmlMapper.writeValue(writer, object);
         } catch (IOException exception) {
-            exception.printStackTrace();
+            throw new TorsionException("Failed to save XML file!", exception);
         }
     }
 }

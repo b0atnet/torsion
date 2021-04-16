@@ -6,45 +6,47 @@ import net.b0at.torsion.parser.file.FileParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Optional;
 
 public class FileStorage<T> implements Storage<T> {
-    private static File baseDirectory = new File(".");
-    private final File file;
+    private static Path baseDirectory = Paths.get(".");
     private final Class<T> clazz;
 
-    private StorageParser<T> fileParser;
+    private final StorageParser<T> fileParser;
 
-    private FileStorage(Class<T> clazz, File file) throws IOException {
-        this.file = file;
+    private FileStorage(Class<T> clazz, Path file) throws IOException {
         this.clazz = clazz;
 
-        this.file.getParentFile().mkdirs();
+        Files.createDirectories(file.getParent());
 
-        if (!this.file.exists()) {
-            this.file.createNewFile();
+        if (!Files.exists(file)) {
+            Files.createFile(file);
         }
 
         try {
-            this.fileParser = FileParserFactory.<T>of(this.file);
+            this.fileParser = FileParserFactory.<T>of(file);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> FileStorage<T> of(Class<T> clazz, File file) throws IOException {
+    public static <T> FileStorage<T> of(Class<T> clazz, Path file) throws IOException {
         return new FileStorage<>(clazz, file);
     }
 
     public static <T> FileStorage<T> of(Class<T> clazz, String fileLocation) throws IOException {
-        return new FileStorage<>(clazz, new File(baseDirectory, fileLocation));
+        return new FileStorage<>(clazz, baseDirectory.resolve(fileLocation));
     }
 
-    public static File getBaseDirectory() {
+    public static Path getBaseDirectory() {
         return FileStorage.baseDirectory;
     }
 
-    public static void setBaseDirectory(File baseDirectory) {
+    public static void setBaseDirectory(Path baseDirectory) {
         FileStorage.baseDirectory = baseDirectory;
     }
 

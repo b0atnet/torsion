@@ -6,6 +6,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.Map;
 
 public class FileParserFactory {
@@ -15,11 +16,11 @@ public class FileParserFactory {
             .put("yml", YMLFileParser.class)
             .build();
 
-    public static StorageParser of(File file) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        return from(file, FilenameUtils.getExtension(file.getAbsolutePath()).toLowerCase());
+    public static StorageParser of(Path file) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        return from(file, FilenameUtils.getExtension(file.toString()).toLowerCase());
     }
 
-    public static <T> StorageParser from(File file, String extension) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static <T> StorageParser from(Path file, String extension) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         Class<? extends FileStorageParser> parserClass = PARSER_MAP.getOrDefault(extension, NullFileParser.class);
 
         return parserClass.getDeclaredConstructor(File.class).newInstance(file);
