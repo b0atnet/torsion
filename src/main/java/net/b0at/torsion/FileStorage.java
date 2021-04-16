@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Optional;
 
-public class FileStorage<T> implements Storage<T> {
+public final class FileStorage<T> implements Storage<T> {
     private static Path baseDirectory = Paths.get(".");
     private final Class<T> clazz;
 
@@ -28,9 +28,10 @@ public class FileStorage<T> implements Storage<T> {
         }
 
         try {
-            this.fileParser = FileParserFactory.<T>of(file);
+            //noinspection unchecked
+            this.fileParser = (StorageParser<T>)FileParserFactory.of(file);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new TorsionException("Failed to create file parser!", e);
         }
     }
 

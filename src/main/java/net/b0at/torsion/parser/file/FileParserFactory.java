@@ -9,20 +9,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class FileParserFactory {
+public final class FileParserFactory {
     private static final Map<String, Class<? extends FileStorageParser>> PARSER_MAP = ImmutableMap.<String, Class<? extends FileStorageParser>>builder()
             .put("json", JSONFileParser.class)
             .put("xml", XMLFileParser.class)
             .put("yml", YMLFileParser.class)
             .build();
 
-    public static StorageParser of(Path file) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    private FileParserFactory() {
+    }
+
+    public static StorageParser<?> of(Path file) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return from(file, FilenameUtils.getExtension(file.toString()).toLowerCase());
     }
 
-    public static <T> StorageParser from(Path file, String extension) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Class<? extends FileStorageParser> parserClass = PARSER_MAP.getOrDefault(extension, NullFileParser.class);
+    public static StorageParser<?> from(Path file, String extension) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        @SuppressWarnings("unchecked")
+        Class<? extends FileStorageParser<?>> parserClass = (Class<FileStorageParser<?>>) PARSER_MAP.getOrDefault(extension, NullFileParser.class);
 
-        return parserClass.getDeclaredConstructor(File.class).newInstance(file);
+        return parserClass.getDeclaredConstructor(Path.class).newInstance(file);
     }
 }
