@@ -29,14 +29,14 @@ public final class FileStorage<T> implements Storage<T> {
 
         try {
             //noinspection unchecked
-            this.fileParser = (StorageParser<T>)FileParserFactory.of(file);
+            this.fileParser = (StorageParser<T>) FileParserFactory.of(file);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new TorsionException("Failed to create file parser!", e);
         }
     }
 
     public static <T> FileStorage<T> of(Class<T> clazz, Path file) throws IOException {
-        return new FileStorage<>(clazz, file);
+        return new FileStorage<>(clazz, baseDirectory.resolve(file));
     }
 
     public static <T> FileStorage<T> of(Class<T> clazz, String fileLocation) throws IOException {

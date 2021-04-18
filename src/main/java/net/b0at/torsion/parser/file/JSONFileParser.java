@@ -14,7 +14,6 @@ import java.util.Optional;
 
 public class JSONFileParser<T> extends FileStorageParser<T> {
     private static boolean serializeNulls;
-    private static boolean lenient;
 
     public JSONFileParser(Path file) {
         super(file);
