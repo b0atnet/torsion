@@ -1,63 +1,27 @@
 package net.b0at.torsion.parser.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import net.b0at.torsion.TorsionException;
 
-import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
-public class JSONFileParser<T> extends FileStorageParser<T> {
+public class JSONFileParser<T> extends JacksonFileParser<T> {
     private static boolean serializeNulls;
 
     public JSONFileParser(Path file) {
-        super(file);
+        super(file, "JSON");
     }
 
     @Override
-    public Optional<T> load(Class<? extends T> clazz) {
-        try {
-            if (!Files.exists(this.file) || (Files.size(this.file) == 0)) {
-                return Optional.empty();
+    protected ObjectMapper createObjectMapper() {
+        return JacksonFileParser.constructObjectMapper(new JsonFactory(), objectMapper -> {
+            if (JSONFileParser.serializeNulls) {
+                objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+            } else {
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             }
-
-            ObjectMapper objectMapper = constructObjectMapper();
-
-            return Optional.ofNullable(objectMapper.readValue(Files.newBufferedReader(this.file), clazz));
-        } catch (IOException exception) {
-            throw new TorsionException("Failed to load JSON file!", exception);
-        }
-    }
-
-    @Override
-    public void save(T object) {
-        try (Writer writer = Files.newBufferedWriter(this.file)) {
-            constructObjectMapper().writeValue(writer, object);
-        } catch (IOException exception) {
-            throw new TorsionException("Failed to save JSON file!", exception);
-        }
-    }
-
-    private static ObjectMapper constructObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.disable(MapperFeature.AUTO_DETECT_GETTERS, MapperFeature.AUTO_DETECT_IS_GETTERS);
-
-        if (JSONFileParser.serializeNulls) {
-            objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
-        } else {
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        }
-
-        return objectMapper;
+        });
     }
 
     public static void setSerializeNulls(boolean serializeNulls) {

@@ -13,7 +13,6 @@ import java.util.Map;
  * Jordin is still best hacker.
  */
 public class StorageTest {
-
     public static void main(String[] args) throws IOException {
         Storage<TestClass> storage = FileStorage.of(TestClass.class, "test.json");
 
