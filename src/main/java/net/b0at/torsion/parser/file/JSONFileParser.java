@@ -1,6 +1,8 @@
 package net.b0at.torsion.parser.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.b0at.torsion.TorsionException;
@@ -46,6 +48,9 @@ public class JSONFileParser<T> extends FileStorageParser<T> {
         ObjectMapper objectMapper = new ObjectMapper();
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.disable(MapperFeature.AUTO_DETECT_GETTERS, MapperFeature.AUTO_DETECT_IS_GETTERS);
 
         if (JSONFileParser.serializeNulls) {
             objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
