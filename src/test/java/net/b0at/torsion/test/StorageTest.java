@@ -1,6 +1,6 @@
 package net.b0at.torsion.test;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.b0at.torsion.FileStorage;
 import net.b0at.torsion.Storage;
 
@@ -15,7 +15,7 @@ import java.util.Map;
 public class StorageTest {
 
     public static void main(String[] args) throws IOException {
-        Storage<TestClass> storage = FileStorage.of(TestClass.class, "test.xml");
+        Storage<TestClass> storage = FileStorage.of(TestClass.class, "test.json");
 
         TestClass testClass = storage.load().orElse(new TestClass());
 
@@ -27,7 +27,7 @@ public class StorageTest {
     }
 
     public static class TestClass {
-        @SerializedName("test-int")
+        @JsonProperty("test-int")
         public int testInt = -1;
 
         public int testInt2 = -7;

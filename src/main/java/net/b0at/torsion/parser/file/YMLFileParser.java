@@ -1,7 +1,6 @@
 package net.b0at.torsion.parser.file;
 
 import com.esotericsoftware.yamlbeans.YamlConfig;
-import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 import net.b0at.torsion.TorsionException;
@@ -17,7 +16,7 @@ public class YMLFileParser<T> extends FileStorageParser<T> {
     }
 
     @Override
-    public Optional<T> load(Class<T> clazz) {
+    public Optional<T> load(Class<? extends T> clazz) {
         try (Reader bufferedReader = Files.newBufferedReader(this.file)) {
             YamlReader reader = new YamlReader(bufferedReader);
             return Optional.ofNullable(reader.read(clazz));

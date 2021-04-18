@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import net.b0at.torsion.parser.StorageParser;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Map;

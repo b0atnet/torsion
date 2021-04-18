@@ -1,8 +1,8 @@
 package net.b0at.torsion.parser.file;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import net.b0at.torsion.TorsionException;
 
 import java.io.*;
@@ -19,18 +19,15 @@ public class JSONFileParser<T> extends FileStorageParser<T> {
     }
 
     @Override
-    public Optional<T> load(Class<T> clazz) {
+    public Optional<T> load(Class<? extends T> clazz) {
         try {
             if (!Files.exists(this.file) || (Files.size(this.file) == 0)) {
                 return Optional.empty();
             }
 
-            Gson gson = constructGsonBuilder();
+            ObjectMapper objectMapper = constructObjectMapper();
 
-            JsonReader reader = new JsonReader(Files.newBufferedReader(this.file));
-            reader.setLenient(true);
-
-            return Optional.ofNullable(gson.fromJson(reader, clazz));
+            return Optional.ofNullable(objectMapper.readValue(Files.newBufferedReader(this.file), clazz));
         } catch (IOException exception) {
             throw new TorsionException("Failed to load JSON file!", exception);
         }
@@ -39,33 +36,27 @@ public class JSONFileParser<T> extends FileStorageParser<T> {
     @Override
     public void save(T object) {
         try (Writer writer = Files.newBufferedWriter(this.file)) {
-            constructGsonBuilder().toJson(object, writer);
+            constructObjectMapper().writeValue(writer, object);
         } catch (IOException exception) {
             throw new TorsionException("Failed to save JSON file!", exception);
         }
     }
 
-    private static Gson constructGsonBuilder() {
-        GsonBuilder builder = new GsonBuilder();
+    private static ObjectMapper constructObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        builder.setPrettyPrinting();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         if (JSONFileParser.serializeNulls) {
-            builder.serializeNulls();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        } else {
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
 
-        if (JSONFileParser.lenient) {
-            builder.setLenient();
-        }
-
-        return builder.create();
+        return objectMapper;
     }
 
     public static void setSerializeNulls(boolean serializeNulls) {
         JSONFileParser.serializeNulls = serializeNulls;
-    }
-
-    public static void setLenient(boolean lenient) {
-        JSONFileParser.lenient = lenient;
     }
 }
